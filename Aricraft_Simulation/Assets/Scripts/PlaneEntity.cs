@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlaneEntity : MonoBehaviour
 {
-    float m_Velocity = 10;
+    float m_Velocity = 0;
     const float PLANE_ACCELERATION = 10f;
     const float PLANE_DECELERATION = 10f;
     const float PLANE_MIN_VELOCITY = 10f;
@@ -15,20 +15,53 @@ public class PlaneEntity : MonoBehaviour
     const float ROLL_DECELERATION = 100f;
     const float MAX_ROLL_VELOCITY = 100f;
 
+    float m_PitchVelocity = 0;
+    const float Pitch_ACCELERATION = 100f;
+    const float Pitch_DECELERATION = 100f;
+    const float MAX_Pitch_VELOCITY = 100f;
+
     private void FixedUpdate(){
+        ForwardControl();
+        RollControl();
+        PitchControl();
         this.transform.Translate(m_Velocity * Time.fixedDeltaTime * Vector3.right);
-        RollControll();
         this.transform.Rotate(m_RollVelocity *Time.fixedDeltaTime, 0, 0);
-    
+        this.transform.Rotate(0, 0, m_PitchVelocity * Time.fixedDeltaTime);
     }
-    void RollControll() {
-        if (Input.GetKey(KeyCode.LeftArrow)){
+
+    void RollControl() {
+        if (Input.GetKey(KeyCode.LeftArrow))        {
             m_RollVelocity = Mathf.Min(MAX_ROLL_VELOCITY, m_RollVelocity + ROLL_ACCELERATION * Time.fixedDeltaTime);
         }
-        if (Input.GetKey(KeyCode.RightArrow)) {
-            m_RollVelocity = Mathf.Max(-MAX_ROLL_VELOCITY, m_RollVelocity - m_RollVelocity - ROLL_DECELERATION * Time.fixedDeltaTime);
+        else if (Input.GetKey(KeyCode.RightArrow))
+        {
+            m_RollVelocity = Mathf.Max(-MAX_ROLL_VELOCITY, m_RollVelocity - ROLL_ACCELERATION * Time.fixedDeltaTime);
         }
-
+        else
+        {
+            m_RollVelocity = m_RollVelocity > 0 ?
+                Mathf.Min(0, m_RollVelocity - ROLL_DECELERATION * Time.fixedDeltaTime) :
+                Mathf.Max(0, m_RollVelocity + ROLL_DECELERATION * Time.fixedDeltaTime);
+        }
     }
 
+    void ForwardControl() {
+        if (Input.GetKey(KeyCode.Space)) {
+            m_Velocity = Mathf.Min(PLANE_MAX_VELOCITY, m_Velocity + PLANE_ACCELERATION * Time.fixedDeltaTime);
+        } else if (Input.GetKey(KeyCode.LeftShift)) {
+            m_Velocity = Mathf.Max(0, m_Velocity - PLANE_DECELERATION * Time.fixedDeltaTime);
+        } 
+    }
+
+    void PitchControl() {
+        if (Input.GetKey(KeyCode.UpArrow)) {
+            m_PitchVelocity = Mathf.Min(MAX_Pitch_VELOCITY, m_PitchVelocity + Pitch_ACCELERATION *Time.fixedDeltaTime);
+        } else if (Input.GetKey(KeyCode.DownArrow)) {
+            m_PitchVelocity = Mathf.Max(-MAX_Pitch_VELOCITY, m_PitchVelocity - Pitch_ACCELERATION * Time.fixedDeltaTime);
+        } else {
+            m_PitchVelocity = m_PitchVelocity > 0 ?
+                Mathf.Min(0, m_PitchVelocity - Pitch_DECELERATION * Time.fixedDeltaTime) :
+                Mathf.Max(0, m_PitchVelocity + Pitch_DECELERATION * Time.fixedDeltaTime);
+        }
+    }
 }
