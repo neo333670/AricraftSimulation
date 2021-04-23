@@ -8,6 +8,8 @@ public class TurretEntity : MonoBehaviour
     public GameObject m_Base;
     public GameObject m_Gun;
 
+    [SerializeField] GameObject m_Bullet;
+
     private void FixedUpdate()
     {   //base rotation
         Vector3 diffVec = m_target.transform.position - this.transform.position;
@@ -22,5 +24,12 @@ public class TurretEntity : MonoBehaviour
         var targetGunQuaternion = Quaternion.FromToRotation
         (new Vector3(-xzPjLength, 0, 0), new Vector3(-xzPjLength, diffVec.y, 0));
         m_Gun.transform.localRotation = targetGunQuaternion;
+
+        //shoot bullet
+        if (Input.GetKeyDown(KeyCode.Return)) {
+            var bullet = GameObject.Instantiate(m_Bullet);
+            bullet.transform.position = m_Gun.transform.position;
+            bullet.GetComponent<Rigidbody>().velocity = -m_Gun.transform.right * 500;
+        }
     }
 }
